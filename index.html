@@ -98,7 +98,7 @@
   }
   .qty {
     flex: 1 1 130px;
-    min-width: 120px;
+    min-width: 110px;
     border: 2px solid var(--line);
     border-radius: 16px;
     padding: 12px 12px 10px;
@@ -137,19 +137,26 @@
   .qty input:focus { outline: none; }
   .qty .u { font-size: .85rem; font-weight: 700; color: var(--muted); }
 
-  /* result group bundles volume + weight */
+  /* sugar & water are inputs, kept compact */
+  .qty.small {
+    flex: 0 1 104px;
+    min-width: 90px;
+  }
+  .qty.small input { font-size: 1.25rem; }
+
+  /* result group bundles volume + weight, shown in line */
   .result {
-    flex: 1 1 150px;
+    flex: 1 1 230px;
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
     gap: 8px;
-    padding: 6px 6px;
+    padding: 6px;
     border-radius: 18px;
     background: linear-gradient(180deg, rgba(37,99,235,.06), rgba(96,165,250,.04));
     border: 1px dashed var(--blue-2);
   }
-  .result .cap { text-align: center; font-size: .66rem; color: var(--muted); letter-spacing: .05em; text-transform: uppercase; }
-  .result .qty { border-color: transparent; background: rgba(255,255,255,.85); }
+  .result .cap { width: 100%; text-align: center; font-size: .66rem; color: var(--muted); letter-spacing: .05em; text-transform: uppercase; }
+  .result .qty { flex: 1 1 0; min-width: 100px; border-color: transparent; background: rgba(255,255,255,.85); }
 
   .meta {
     display: flex;
@@ -184,8 +191,7 @@
 <body>
 <div class="wrap">
   <header>
-    <h1>🍯 Simple Syrup</h1>
-    <p>Pick any value — the rest recalculate instantly.</p>
+    <h1>Simple Syrup Calculator</h1>
   </header>
 
   <div class="toolbar">
@@ -200,15 +206,15 @@
   </div>
 
   <div class="formula">
-    <div class="qty" data-field="sugar">
-      <div class="k">🧂 Sugar</div>
+    <div class="qty small" data-field="sugar">
+      <div class="k">Sugar</div>
       <div class="row"><input type="number" min="0" step="any" inputmode="decimal" /><span class="u"></span></div>
     </div>
 
     <div class="op">+</div>
 
-    <div class="qty" data-field="water">
-      <div class="k">💧 Water</div>
+    <div class="qty small" data-field="water">
+      <div class="k">Water</div>
       <div class="row"><input type="number" min="0" step="any" inputmode="decimal" /><span class="u"></span></div>
     </div>
 
@@ -217,11 +223,11 @@
     <div class="result">
       <div class="cap">Syrup — two ways to measure</div>
       <div class="qty" data-field="volume">
-        <div class="k">🥃 Volume</div>
+        <div class="k">Volume</div>
         <div class="row"><input type="number" min="0" step="any" inputmode="decimal" /><span class="u"></span></div>
       </div>
       <div class="qty" data-field="weight">
-        <div class="k">⚖️ Weight</div>
+        <div class="k">Weight</div>
         <div class="row"><input type="number" min="0" step="any" inputmode="decimal" /><span class="u"></span></div>
       </div>
     </div>
