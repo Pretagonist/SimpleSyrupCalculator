@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Simple Syrup Calculator</title>
+<style>
+  :root {
+    --bg: #faf6f0;
+    --card: #ffffff;
+    --ink: #2b2320;
+    --muted: #7d7068;
+    --accent: #b9743a;
+    --accent-soft: #f3e3d3;
+    --line: #e7ddd2;
+    --good: #4d7c4d;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.5;
+  }
+  .wrap { max-width: 640px; margin: 0 auto; padding: 24px 16px 64px; }
+  header h1 { margin: 0 0 4px; font-size: 1.6rem; }
+  header p { margin: 0 0 24px; color: var(--muted); }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 2px rgba(0,0,0,.03);
+  }
+  label { display: block; font-weight: 600; font-size: .9rem; margin-bottom: 8px; }
+  .field { margin-bottom: 18px; }
+  .field:last-child { margin-bottom: 0; }
+  .seg {
+    display: inline-flex;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+    background: #f7f1ea;
+  }
+  .seg button {
+    border: 0;
+    background: transparent;
+    padding: 8px 16px;
+    font-size: .9rem;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .seg button.active { background: var(--accent); color: #fff; }
+  select, input[type="number"] {
+    width: 100%;
+    padding: 11px 12px;
+    font-size: 1rem;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: #fff;
+    color: var(--ink);
+  }
+  input:focus, select:focus { outline: 2px solid var(--accent-soft); border-color: var(--accent); }
+  .input-row { display: flex; gap: 10px; align-items: stretch; }
+  .input-row input { flex: 1; }
+  .unit-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0 16px;
+    background: var(--accent-soft);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    font-weight: 700;
+    color: var(--accent);
+    min-width: 60px;
+    justify-content: center;
+  }
+  .results { background: linear-gradient(180deg, #fff, #fdf8f2); }
+  .results h2 { margin: 0 0 16px; font-size: 1.1rem; }
+  .recipe { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px; }
+  .stat {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px;
+    text-align: center;
+    background: #fff;
+  }
+  .stat .v { font-size: 1.5rem; font-weight: 700; }
+  .stat .v small { font-size: .9rem; font-weight: 600; color: var(--muted); }
+  .stat .k { font-size: .8rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+  .stat.hi { border-color: var(--accent); background: var(--accent-soft); }
+  .meta { display: flex; justify-content: space-around; padding-top: 14px; border-top: 1px dashed var(--line); color: var(--muted); font-size: .85rem; }
+  .meta b { color: var(--ink); }
+  details { margin-top: 8px; }
+  details summary { cursor: pointer; font-weight: 600; color: var(--accent); }
+  .science { color: var(--muted); font-size: .9rem; }
+  .science code { background: #f1ebe3; padding: 1px 5px; border-radius: 4px; }
+  .err { color: #a23b3b; font-weight: 600; }
+  footer { text-align: center; color: var(--muted); font-size: .8rem; margin-top: 8px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>🍯 Simple Syrup Calculator</h1>
+    <p>Accurate sugar &amp; water amounts — accounting for the fact that sugar
+       dissolves <em>into</em> the water rather than adding to its volume.</p>
+  </header>
+
+  <div class="card">
+    <div class="field">
+      <label>Units</label>
+      <div class="seg" id="units">
+        <button data-val="metric" class="active">Metric (g / mL)</button>
+        <button data-val="imperial">Imperial (oz / fl oz)</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Ratio <span style="font-weight:400;color:var(--muted)">(sugar : water, by weight)</span></label>
+      <div class="seg" id="ratio">
+        <button data-val="1" class="active">1 : 1 &nbsp;regular</button>
+        <button data-val="0.5">2 : 1 &nbsp;thick</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="mode">I want to specify…</label>
+      <select id="mode">
+        <option value="sugar">The sugar I have</option>
+        <option value="finalVolume">The final syrup volume I want</option>
+        <option value="finalMass">The final syrup weight I want</option>
+        <option value="water">The water I have</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="amount" id="amountLabel">Amount</label>
+      <div class="input-row">
+        <input type="number" id="amount" min="0" step="any" value="100" />
+        <span class="unit-badge" id="amountUnit">g</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card results">
+    <h2>Recipe</h2>
+    <div id="output"></div>
+  </div>
+
+  <div class="card">
+    <details open>
+      <summary>The science — why volumes don't add up</summary>
+      <p class="science">
+        Dissolving sugar in water doesn't increase the volume by the dry
+        volume of the sugar — the sugar molecules tuck into spaces between
+        water molecules. So <code>100&nbsp;g sugar + 100&nbsp;mL water ≠ 200&nbsp;mL</code>.
+        It weighs 200&nbsp;g, but measures only about <b>163&nbsp;mL</b>.
+      </p>
+      <p class="science">
+        This calculator works in <b>mass</b> (the ratio is by weight), then
+        converts the total mass to volume using the measured <b>density of a
+        sucrose solution</b> at 20&nbsp;°C. Density depends on the sugar
+        concentration (°Brix = sugar&nbsp;% by weight), interpolated from
+        standard NBS/ICUMSA reference tables:
+      </p>
+      <p class="science" id="scienceFacts"></p>
+    </details>
+  </div>
+
+  <footer>Densities at 20&nbsp;°C. Water assumed ≈ 1 g/mL. Imperial uses weight oz (28.35 g) &amp; fluid oz (29.57 mL).</footer>
+</div>
+
+<script>
+"use strict";
+
+// --- Sucrose solution density @ 20C (g/mL) vs Brix (sugar mass %) ---
+// Source: NBS Circular 440 / ICUMSA reference values.
+const DENSITY_TABLE = [
+  [0,  0.998203], [10, 1.038143], [20, 1.080990], [30, 1.127080],
+  [40, 1.176447], [50, 1.229567], [60, 1.286455], [70, 1.346972],
+];
+
+function density(brix) {
+  const t = DENSITY_TABLE;
+  if (brix <= t[0][0]) return t[0][1];
+  if (brix >= t[t.length - 1][0]) return t[t.length - 1][1];
+  for (let i = 0; i < t.length - 1; i++) {
+    const [b1, d1] = t[i], [b2, d2] = t[i + 1];
+    if (brix >= b1 && brix <= b2) {
+      return d1 + (brix - b1) / (b2 - b1) * (d2 - d1);
+    }
+  }
+}
+
+// --- Unit conversions ---
+const G_PER_OZ = 28.349523;     // avoirdupois (weight) ounce
+const ML_PER_FLOZ = 29.573530;  // US fluid ounce
+
+const state = { units: "metric", ratio: 1, mode: "sugar" };
+
+function massUnit()   { return state.units === "metric" ? "g"  : "oz"; }
+function volUnit()     { return state.units === "metric" ? "mL" : "fl oz"; }
+function toGrams(v)    { return state.units === "metric" ? v : v * G_PER_OZ; }
+function fromGrams(g)  { return state.units === "metric" ? g : g / G_PER_OZ; }
+function toMl(v)       { return state.units === "metric" ? v : v * ML_PER_FLOZ; }
+function fromMl(ml)    { return state.units === "metric" ? ml : ml / ML_PER_FLOZ; }
+
+function fmt(n) {
+  if (!isFinite(n)) return "–";
+  if (n >= 100) return n.toFixed(0);
+  if (n >= 10)  return n.toFixed(1);
+  return n.toFixed(2);
+}
+
+// Whether the current input is a volume (only the final-volume mode)
+function inputIsVolume() { return state.mode === "finalVolume"; }
+
+function compute(rawValue) {
+  const wps = state.ratio;               // water parts per 1 part sugar (by weight)
+  const brixFrac = 1 / (1 + wps);        // sugar mass fraction — fixed by the ratio
+  const brix = brixFrac * 100;
+  const rho = density(brix);             // g/mL, constant for this ratio
+
+  let sugarG, waterG, totalG;
+
+  switch (state.mode) {
+    case "sugar":
+      sugarG = toGrams(rawValue);
+      waterG = sugarG * wps;
+      totalG = sugarG + waterG;
+      break;
+    case "water":
+      waterG = toGrams(rawValue);
+      sugarG = waterG / wps;
+      totalG = sugarG + waterG;
+      break;
+    case "finalMass":
+      totalG = toGrams(rawValue);
+      sugarG = totalG * brixFrac;
+      waterG = totalG - sugarG;
+      break;
+    case "finalVolume":
+      totalG = toMl(rawValue) * rho;     // volume -> mass via density
+      sugarG = totalG * brixFrac;
+      waterG = totalG - sugarG;
+      break;
+  }
+
+  const volMl = totalG / rho;
+  return {
+    sugarG, waterG, totalG, volMl, brix, rho,
+    // water by volume too (water ≈ 1 g/mL), handy for measuring
+    waterMl: waterG,
+  };
+}
+
+function render() {
+  const out = document.getElementById("output");
+  const raw = parseFloat(document.getElementById("amount").value);
+
+  if (!(raw > 0)) {
+    out.innerHTML = '<p class="err">Enter a positive amount.</p>';
+    return;
+  }
+
+  const r = compute(raw);
+  const mu = massUnit(), vu = volUnit();
+
+  out.innerHTML = `
+    <div class="recipe">
+      <div class="stat hi">
+        <div class="v">${fmt(fromGrams(r.sugarG))} <small>${mu}</small></div>
+        <div class="k">Sugar</div>
+      </div>
+      <div class="stat hi">
+        <div class="v">${fmt(fromGrams(r.waterG))} <small>${mu}</small></div>
+        <div class="k">Water (${fmt(fromMl(r.waterMl))} ${vu})</div>
+      </div>
+      <div class="stat">
+        <div class="v">${fmt(fromMl(r.volMl))} <small>${vu}</small></div>
+        <div class="k">Final volume</div>
+      </div>
+      <div class="stat">
+        <div class="v">${fmt(fromGrams(r.totalG))} <small>${mu}</small></div>
+        <div class="k">Final weight</div>
+      </div>
+    </div>
+    <div class="meta">
+      <span>Concentration <b>${r.brix.toFixed(1)}°Brix</b></span>
+      <span>Density <b>${r.rho.toFixed(3)} g/mL</b></span>
+    </div>`;
+}
+
+function renderScience() {
+  const lines = [["1 : 1", 1], ["2 : 1", 0.5]].map(([lbl, wps]) => {
+    const brix = 100 / (1 + wps);
+    const rho = density(brix);
+    return `<b>${lbl}</b> → ${brix.toFixed(1)}°Brix, ${rho.toFixed(3)} g/mL`;
+  });
+  document.getElementById("scienceFacts").innerHTML = lines.join("&nbsp;&nbsp;•&nbsp;&nbsp;");
+}
+
+function syncLabels() {
+  const labels = {
+    sugar: "Sugar you have",
+    water: "Water you have",
+    finalMass: "Final syrup weight you want",
+    finalVolume: "Final syrup volume you want",
+  };
+  document.getElementById("amountLabel").textContent = labels[state.mode];
+  document.getElementById("amountUnit").textContent = inputIsVolume() ? volUnit() : massUnit();
+}
+
+// --- Wire up controls ---
+function bindSeg(id, key, parse) {
+  document.getElementById(id).addEventListener("click", (e) => {
+    const btn = e.target.closest("button");
+    if (!btn) return;
+    [...e.currentTarget.children].forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+    state[key] = parse(btn.dataset.val);
+    syncLabels();
+    render();
+  });
+}
+
+bindSeg("units", "units", (v) => v);
+bindSeg("ratio", "ratio", (v) => parseFloat(v));
+
+document.getElementById("mode").addEventListener("change", (e) => {
+  state.mode = e.target.value;
+  syncLabels();
+  render();
+});
+document.getElementById("amount").addEventListener("input", render);
+
+renderScience();
+syncLabels();
+render();
+</script>
+</body>
+</html>
