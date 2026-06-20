@@ -26,3 +26,7 @@ on concentration (°Brix = sugar % by weight):
 | ------------------- | ----- | -------------- |
 | 1:1 (regular)       | 50.0  | 1.230          |
 | 2:1 (thick)         | 66.7  | 1.327          |
+
+## License
+
+Released into the public domain under [The Unlicense](LICENSE) — do whatever you want with it.
