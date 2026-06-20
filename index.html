@@ -142,7 +142,15 @@
     flex: 0 1 104px;
     min-width: 90px;
   }
-  .qty.small input { font-size: 1.25rem; }
+  .qty.small .k { justify-content: center; }
+  .qty.small .row { justify-content: center; }
+  .qty.small input {
+    font-size: 1.25rem;
+    width: auto;
+    field-sizing: content;
+    min-width: 2ch;
+    text-align: center;
+  }
 
   /* result group bundles volume + weight, shown in line */
   .result {
