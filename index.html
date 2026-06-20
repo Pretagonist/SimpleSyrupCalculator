@@ -75,8 +75,8 @@
     box-shadow: 0 4px 12px var(--glow);
   }
   .note {
-    max-width: 460px;
-    margin: -12px auto 22px;
+    max-width: 480px;
+    margin: 16px auto 0;
     text-align: center;
     color: var(--muted);
     font-size: .8rem;
@@ -219,8 +219,6 @@
     </div>
   </div>
 
-  <p class="note">1:1 is the standard ratio; rich 2:1 has more sugar, so it's sweeter and keeps longer (more shelf-stable).</p>
-
   <div class="formula">
     <div class="qty small" data-field="sugar">
       <div class="k">Sugar</div>
@@ -264,6 +262,8 @@
       solution</b> at 20 °C, interpolated from standard NBS/ICUMSA data.
     </p>
   </details>
+
+  <p class="note">1:1 is the standard ratio; rich 2:1 has more sugar, so it's sweeter and keeps longer (more shelf-stable).</p>
 
   <footer>Densities at 20 °C · water ≈ 1 g/mL · imperial uses weight oz (28.35 g) &amp; fluid oz (29.57 mL)</footer>
 </div>
@@ -353,6 +353,33 @@ function render(skipActive) {
   }
   document.getElementById("mBrix").textContent = m.brix.toFixed(1) + "°Bx";
   document.getElementById("mRho").textContent = m.rho.toFixed(3) + " g/mL";
+  save();
+}
+
+// --- Persistence ---
+const STORAGE_KEY = "simpleSyrupCalc";
+function save() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      units: state.units, ratio: state.ratio, active: state.active, amount: state.amount,
+    }));
+  } catch (e) { /* storage unavailable — ignore */ }
+}
+function load() {
+  try {
+    const s = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+    if (!s) return;
+    if (s.units === "metric" || s.units === "imperial") state.units = s.units;
+    if (s.ratio === 1 || s.ratio === 0.5) state.ratio = s.ratio;
+    if (["sugar", "water", "weight", "volume"].includes(s.active)) state.active = s.active;
+    if (typeof s.amount === "number" && isFinite(s.amount) && s.amount >= 0) state.amount = s.amount;
+  } catch (e) { /* corrupt/unavailable — ignore */ }
+}
+// Reflect a stored value in a segmented toggle's active button.
+function syncSeg(id, val) {
+  document.querySelectorAll("#" + id + " button").forEach((b) => {
+    b.classList.toggle("active", b.dataset.val === String(val));
+  });
 }
 
 function setActiveFromInput(f) {
@@ -389,6 +416,10 @@ function bindSeg(id, key, parse) {
 bindSeg("units", "units", (v) => v);
 bindSeg("ratio", "ratio", (v) => parseFloat(v));
 
+// Restore saved inputs & selections, then draw.
+load();
+syncSeg("units", state.units);
+syncSeg("ratio", state.ratio);
 render(false);
 </script>
 </body>
