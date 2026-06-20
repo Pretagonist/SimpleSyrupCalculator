@@ -143,8 +143,9 @@
     min-width: 90px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
   }
+  /* label stays at top; only the input is vertically centered below it */
+  .qty.small .row { flex: 1; align-items: center; }
   .qty.small input { font-size: 1.25rem; }
 
   /* result group bundles volume + weight, shown in line */
