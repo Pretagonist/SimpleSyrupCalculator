@@ -7,7 +7,7 @@ Open [`index.html`](index.html) in any browser — no build step, no dependencie
 ## Features
 
 - **Metric or Imperial** — grams / mL, or weight-ounces / fluid-ounces.
-- **Ratios** — 1:1 (standard) or 1:2 (thin), sugar : water by weight.
+- **Ratios** — 1:1 (regular) or 2:1 (thick / rich), sugar : water by weight.
 - **Solve from any direction** — specify the sugar you have, the water you have,
   the final syrup *volume* you want, or the final syrup *weight* you want.
 
@@ -24,5 +24,5 @@ on concentration (°Brix = sugar % by weight):
 
 | Ratio (sugar:water) | °Brix | Density (g/mL) |
 | ------------------- | ----- | -------------- |
-| 1:1                 | 50.0  | 1.230          |
-| 1:2                 | 33.3  | 1.143          |
+| 1:1 (regular)       | 50.0  | 1.230          |
+| 2:1 (thick)         | 66.7  | 1.327          |

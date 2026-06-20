@@ -122,8 +122,8 @@
     <div class="field">
       <label>Ratio <span style="font-weight:400;color:var(--muted)">(sugar : water, by weight)</span></label>
       <div class="seg" id="ratio">
-        <button data-val="1" class="active">1 : 1 &nbsp;standard</button>
-        <button data-val="2">1 : 2 &nbsp;thin</button>
+        <button data-val="1" class="active">1 : 1 &nbsp;regular</button>
+        <button data-val="0.5">2 : 1 &nbsp;thick</button>
       </div>
     </div>
 
@@ -296,7 +296,7 @@ function render() {
 }
 
 function renderScience() {
-  const lines = [["1 : 1", 1], ["1 : 2", 2]].map(([lbl, wps]) => {
+  const lines = [["1 : 1", 1], ["2 : 1", 0.5]].map(([lbl, wps]) => {
     const brix = 100 / (1 + wps);
     const rho = density(brix);
     return `<b>${lbl}</b> → ${brix.toFixed(1)}°Brix, ${rho.toFixed(3)} g/mL`;
@@ -329,7 +329,7 @@ function bindSeg(id, key, parse) {
 }
 
 bindSeg("units", "units", (v) => v);
-bindSeg("ratio", "ratio", (v) => parseInt(v, 10));
+bindSeg("ratio", "ratio", (v) => parseFloat(v));
 
 document.getElementById("mode").addEventListener("change", (e) => {
   state.mode = e.target.value;
