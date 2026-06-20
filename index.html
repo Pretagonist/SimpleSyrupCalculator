@@ -141,11 +141,13 @@
   .qty.small {
     flex: 0 1 104px;
     min-width: 90px;
+    position: relative;
     display: flex;
-    flex-direction: column;
+    align-items: center;
   }
-  /* label stays at top; only the input is vertically centered below it */
-  .qty.small .row { flex: 1; align-items: center; }
+  /* label pinned at top; input centered in the full box height */
+  .qty.small .k { position: absolute; top: 12px; left: 12px; }
+  .qty.small .row { flex: 1; margin-top: 0; }
   .qty.small input { font-size: 1.25rem; }
 
   /* result group bundles volume + weight, shown in line */
